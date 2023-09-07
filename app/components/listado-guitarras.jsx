@@ -3,7 +3,7 @@ import Guitarra from "./guitarra";
 function ListadoGuitarras({ guitarras }) {
   return (
     <>
-      <h1 className="heading">Nuestra Colección</h1>
+      <h2 className="heading">Nuestra Colección</h2>
       {guitarras?.length && (
         <div className="guitarras-grid">
           {guitarras.map((guitarra) => (
