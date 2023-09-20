@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Meta,
   Links,
@@ -47,11 +48,61 @@ export function links() {
 }
 
 export default function App() {
+  const carritoLS =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("carrito")) ?? []
+      : null;
+  const [carrito, setCarrito] = useState(carritoLS);
+
+  useEffect(() => {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+  }, [carrito]);
+
+  const agregarCarrito = (guitarra) => {
+    // Comprobar si existe
+    if (carrito.some((guitarraState) => guitarraState.id === guitarra.id)) {
+      // Modificar su cantidad
+      const carritoActualizado = carrito.map((guitarraState) => {
+        if (guitarraState.id === guitarra.id) {
+          guitarraState.cantidad = guitarra.cantidad;
+        }
+
+        return guitarraState;
+      });
+      // Añadir al carrito
+      setCarrito(carritoActualizado);
+    } else {
+      // Registro nuevo
+      setCarrito([...carrito, guitarra]);
+    }
+  };
+
+  const actualizarCantidad = (guitarra) => {
+    const carritoActualizado = carrito.map((guitarraState) => {
+      if (guitarraState.id === guitarra.id) {
+        guitarraState.cantidad = guitarra.cantidad;
+      }
+      return guitarraState;
+    });
+    setCarrito(carritoActualizado);
+  };
+
+  const eliminarProducto = (id) => {
+    const carritoActualizado = carrito.filter(
+      (guitarraState) => guitarraState.id !== id
+    );
+
+    setCarrito(carritoActualizado);
+  };
+
   return (
     <Document>
       <Outlet
         context={{
-          guitarLa: "GuitarLA",
+          agregarCarrito,
+          carrito,
+          actualizarCantidad,
+          eliminarProducto,
         }}
       />
     </Document>
@@ -69,17 +120,16 @@ function Document({ children }) {
         <Header />
         {children}
         <Footer />
-        {/* <Scripts /> */}
+        <Scripts />
         <LiveReload />
       </body>
     </html>
   );
 }
 
-/*** Manejo de Errores ***/
+/*** Manejo de Errores en Remix***/
 export function ErrorBoundary() {
   const error = useRouteError();
-  console.log(error);
 
   if (isRouteErrorResponse(error)) {
     return (
